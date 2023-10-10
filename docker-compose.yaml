@@ -9,7 +9,6 @@ services:
     ports:
       - 127.0.0.1:8000:8000
     command: bash -c "uvicorn  main:app --host 0.0.0.0 --port 8000"
-
     depends_on:
       - postgres
   postgres:
@@ -20,5 +19,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  py-linters:
+    build:
+      context: ./py-linters/
+    image: py-linters:latest
+    volumes:
+      - ./py-linters/pyproject.toml:/opt/linters/pyproject.toml
+      - ./py-linters/poetry.lock:/opt/linters/poetry.lock
+      # mount source code to check a code with linter running inside a container
+      - ./backend:/backend
+    command: 'echo Skipped'
 volumes:
   postgres_data:
