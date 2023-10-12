@@ -1,12 +1,52 @@
+[![FastAPI](https://img.shields.io/badge/-FastAPI-005571?style=flat-square&logo=FastAPI)](https://fastapi.tiangolo.com/)
+[![Pydantic](https://img.shields.io/badge/-Pydantic-14354C?style=flat-square&logo=Pydantic)](https://pydantic-docs.helpmanual.io/)
+[![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
+[![Alembic](https://img.shields.io/badge/-Alembic-f2ae30?style=flat-square&logo=alembic)](https://alembic.sqlalchemy.org/)
+[![SQLAlchemy](https://img.shields.io/badge/-SQLAlchemy-FCA121?style=flat-square&logo=sqlalchemy)](https://www.sqlalchemy.org/)
+[![Docker](https://img.shields.io/badge/-Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+
+# Тестовое задание от компании Bewise
+Для выполнения задачи был использован фреймворк FastAPI в комбинации с alembic, SQLAlchemy, Pydantic, 
+PostgreSQL(psycopg2-binary)
+
+## Содержимое
+
+1. [Описание задачи](#task-description)
+2. [Как запустить](#local-setup)
+3. [Пример POST-запроса к API](#post-example)
+2. [Как вести разработку](#development)
+    1. [Линтеры](#linters)
+    1. [Как обновить зависимости](#add-python-package-to-image)
+
+<a name="task-description"></a>
+## Описание задачи:
+1. С помощью Docker (предпочтительно - docker-compose) развернуть образ с любой опенсорсной СУБД (предпочтительно - 
+PostgreSQL). Предоставить все необходимые скрипты и конфигурационные (docker/compose) файлы для развертывания СУБД, 
+а также инструкции для подключения к ней. Необходимо обеспечить сохранность данных при рестарте контейнера (то есть -
+использовать volume-ы для хранения файлов СУБД на хост-машине.
+2. Реализовать на Python3 простой веб сервис (с помощью FastAPI или Flask, например), выполняющий следующие функции:
+   - В сервисе должно быть реализовано REST API, принимающее на вход POST запросы с содержимым вида `{"questions_num": integer}`.
+   - После получения запроса сервис, в свою очередь, запрашивает с публичного API (англоязычные вопросы для викторин) 
+   https://jservice.io/api/random?count=1 указанное в полученном запросе количество вопросов.
+   - Далее, полученные ответы должны сохраняться в базе данных из п. 1, причем сохранена должна быть как **минимум**
+   следующая информация (название колонок и типы данный можете выбрать сами, также можете добавлять свои колонки):
+     - **ID вопроса**
+     - **Текст вопроса**
+     - **Текст ответа**
+     - **Дата создания вопроса**<br>
+     
+   В случае, если в БД имеется такой же вопрос, к публичному API с викторинами должны выполняться дополнительные запросы до тех пор, пока не будет получен уникальный вопрос для викторины.
+   - Ответом на запрос из п.2.a должен быть предыдущей сохранённый вопрос для викторины. В случае его отсутствия - пустой объект.
+3. В репозитории с заданием должны быть предоставлены инструкции по сборке докер-образа с сервисом из п. 2., его настройке и запуску. А также пример запроса к POST API сервиса.
+4. Желательно, если при выполнении задания вы будете использовать docker-compose, SqlAalchemy,  пользоваться аннотацией типов.
+       
 <a name="local-setup"></a>
-## Как развернуть local-окружение
-
-Для запуска приложения вам понадобятся Docker и Docker Compose. Инструкции по их установке ищите на официальных сайтах:
-
-- [Install Docker Desktop](https://www.docker.com/get-started/)
-- [Install Docker Compose](https://docs.docker.com/compose/install/)
-
-Склонируйте репозиторий.
+## Как запустить
+Склонируйте репозиторий:
+```
+git clone https://github.com/elnarmen/bewise_test.git
+cd bewise_test
+```
 
 Перед запуском Docker Compose в корне репозитория создайте файл `.env` со следующими переменными:
 
@@ -15,8 +55,6 @@ POSTGRES_DB='db_name'
 POSTGRES_USER='user'
 POSTGRES_PASSWORD='password'
 DATABASE_URL = "postgresql://user:password@postgres/db_name"
-Значения переменных замените на параметры вашей БД. url базы данных должен соответствовать шаблону:
-postgres://<user>:<password>@db/<database_name>
 ```
 Скачайте и соберите докер-образы с помощью Docker Сompose:
 
@@ -48,22 +86,38 @@ $ docker compose up
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 
+<a name="post-example"></a>
+## Пример POST-запроса к API:
+URL: https://127.0.0.1:8000/questions
+
+Headers: {'Content-Type': 'application/json'}
+
+Request body: {question_num: 100}
+
 <a name="development"></a>
 ## Как вести разработку
-
-Для того, чтобы автоматически запускать линтеры перед началом разработки установите [pre-commit package manager](https://pre-commit.com/).
-
+<a name="linters"></a>
+### Линтеры
+Для того чтобы при коммите автоматически запускались линтеры, установите [pre-commit package manager](https://pre-commit.com/).
 Затем в корне репозитория запустите команду для настройки хуков:
 
 ```shellw
 $ pre-commit install
 ```
+Если линтеры обнаружат проблемы в коде, коммит прервётся с сообщением об ошибке. 
 
-В дальнейшем при коммите автоматически будут запускаться линтеры. Коммит прервётся с сообщением об ошибке, если
-линтеры обнаружат проблемы в коде.
 
-<a name="add-python-package-to-django-image"></a>
-### Как установить python-пакет в образ
+Чтобы самостоятельно проверить линтером код в каталоге `/app/src/` запустите команду:
+
+```shell
+$ docker compose run --rm py-linters flake8 /app/src/
+…
+/app/src/migrations/env.py:19:1: E303 too many blank lines (3)
+1
+```
+
+<a name="add-python-package-to-image"></a>
+### Как обновить зависимости
 
 В качестве менеджера пакетов для образа используется [Poetry](https://python-poetry.org/docs/).
 
@@ -86,16 +140,4 @@ container:$ exit
 Не забудьте обновить докер-образ, чтобы новые контейнеры тоже получали свежий набор зависимостей:
 ```shell
 $ docker compose build app
-```
-
-<a name="run-python-linters"></a>
-### Как запустить линтеры Python
-
-Линтеры запускаются в отдельном docker-контейнере, а код подключается к нему с помощью volume. 
-Например, чтобы проверить линтером код в каталоге `/app/src/` запустите команду:
-
-```shell
-$ docker compose run --rm py-linters flake8 /app/src/
-…
-/app/src/migrations/env.py:19:1: E303 too many blank lines (3)
 ```

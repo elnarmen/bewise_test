@@ -8,7 +8,7 @@ app = FastAPI()
 MAX_RETRIES = 20
 
 
-@app.post('/')
+@app.post('/questions')
 def main(response: schemas.QuestionQuantityRequest) -> schemas.Question | None:
     retry_count = 0
     questions_num = response.questions_num
