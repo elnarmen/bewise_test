@@ -11,7 +11,7 @@ def get_existing_question_ids(questions: list[schemas.Question]) -> list[int]:
     return db_question_ids
 
 
-def add_questions_to_db(questions: list[schemas.Question]):
+def add_questions_to_db(questions: list[schemas.Question]) -> None:
     with Session() as session:
         db_questions = [
             models.Question(
