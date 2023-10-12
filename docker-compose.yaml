@@ -1,24 +1,26 @@
 version: '3'
 
 services:
-  backend:
+  app:
     build:
-      context: ./backend/
+      context: ./app/
+    env_file:
+      - .env
     volumes:
-      - ./backend:/opt/app/
+      - ./app/:/opt/app/
     ports:
       - 127.0.0.1:8000:8000
-    command: bash -c "uvicorn  main:app --host 0.0.0.0 --port 8000"
+    command: bash -c "uvicorn  main:app --host 0.0.0.0 --port 8000 --reload"
     depends_on:
       - postgres
   postgres:
     image: postgres:16.0
+    ports:
+      - "5432:5432"
     env_file:
       - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
   py-linters:
     build:
       context: ./py-linters/
@@ -27,7 +29,7 @@ services:
       - ./py-linters/pyproject.toml:/opt/linters/pyproject.toml
       - ./py-linters/poetry.lock:/opt/linters/poetry.lock
       # mount source code to check a code with linter running inside a container
-      - ./backend:/backend
+      - ./app:/app
     command: 'echo Skipped'
 volumes:
   postgres_data:

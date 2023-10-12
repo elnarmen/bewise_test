@@ -10,6 +10,6 @@ repos:
     hooks:
       - id: py-linters
         name: py-linters
-        entry: docker compose run -T --rm py-linters flake8 /backend/src/
+        entry: docker compose run -T --rm py-linters flake8 /app/src/
         language: system
         pass_filenames: no
