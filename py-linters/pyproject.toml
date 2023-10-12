@@ -27,6 +27,7 @@ ignore = [
     'D107',
     'W503',  # conflicts with W504 https://github.com/mila-iqia/cookiecutter-pyml/issues/10
 ]
+exclude = "versions"
 max-line-length = 120
 max-complexity = 7
 count = true
