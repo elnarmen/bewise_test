@@ -25,7 +25,3 @@ def main(response: schemas.QuestionQuantityRequest) -> schemas.Question | None:
         if retry_count == MAX_RETRIES:  # выходит из цикла, если jservice перестал выдавать новые вопросы
             break
     return schemas.Question.from_orm(last_db_question) if last_db_question else None
-
-
-if __name__ == '__main__':
-    main()
