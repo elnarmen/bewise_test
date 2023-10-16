@@ -1,6 +1,6 @@
-import models
+from db import models
 import schemas
-from database import Session
+from db.database import Session
 
 
 def get_existing_question_ids(questions: list[schemas.Question]) -> list[int]:

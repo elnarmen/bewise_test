@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 import schemas
 from jservice_client import fetch_random_questions
-from crud import get_existing_question_ids, get_last_db_question, add_questions_to_db
+from db.crud import get_existing_question_ids, get_last_db_question, add_questions_to_db
 
 app = FastAPI()
 MAX_RETRIES = 20
